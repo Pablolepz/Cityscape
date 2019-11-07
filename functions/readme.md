@@ -1,5 +1,7 @@
 **DirectoryReader**
 
+i'm working on sorting part
+
 *DirectoryReader* is in charge of reading the contents in a specified path.
 The path may be provided as a String.
 
