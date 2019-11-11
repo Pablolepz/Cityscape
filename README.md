@@ -5,7 +5,10 @@ A 3D file-system explorer.
 
 
 **GUI** 
-
+TODO
+make it prettier
+needs a list of all folders/files there are in the current directory
+    - find out how to retrieve names of said folders/files
 
 
 **DirectoryReader**
