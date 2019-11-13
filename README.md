@@ -1,26 +1,17 @@
-# Cityscape
+# Cityscape Documentation
 File Explorer
 
 A 3D file-system explorer.
 
+**FileSystemReader**
+contains classes to represent objects in the file system.
+  + The file needs to interface with a sorting class that can be called from a FileSystemReader object.
+  + It may be useful to write an Interface to be implemented by a sorting class.
+  + The sorting class needs to have a SortingRules enum providing enums for sorting types: Alphanumeric, Size, Type, and anything else that can be useful.
+  
 
 **GUI** 
 TODO
 make it prettier
-needs a list of all folders/files there are in the current directory
-    - find out how to retrieve names of said folders/files
-
-
-**DirectoryReader**
-
-*DirectoryReader* is in charge of reading the contents in a specified path.
-The path may be provided as a String.
-
-+ FileInfo, DirectoryInfo, and DriveInfo support various operations that will become useful down the line (e.g. Length, Name, Extension, etc.)
-+ FileInfo and DirectoryInfo make use of FileAttributes class to indicate whether a file is Hidden, Indexed, or a System file. 
-
-Comments:
-+ Main() should be removed eventually to make this a standalone class.
-+ .NET documentation said Strings containing paths should be well-formed, else they will throw exceptions.
-+ Need to add exception handling.
-
++ needs a list of all folders/files there are in the current directory
+    + find out how to retrieve names of said folders/files
