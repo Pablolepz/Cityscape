@@ -5,9 +5,11 @@ using UnityEngine;
 public class main : MonoBehaviour
 {
     public static float GlobalUnit = 0.5f;
-    public static float platformUnit = 0.5f;
+    public static float platformUnit = 0.5f;  
+    //FileSystemReader fsReader = new FileSystemReader();
     //This array is sudo for the array of objects given
     public static GameObject[,] city = new GameObject[5,5];
+    
     public static float GlobalSize(float input)
     {
       return input * GlobalUnit;
@@ -32,9 +34,9 @@ public class main : MonoBehaviour
             city[a,b].transform.position = new Vector3(GlobalSize(a + 0.5f),(((city[a,b].transform.localScale.y)/2) + ((platform.transform.localScale.y)/2)),GlobalSize(b + 0.5f));
           }
         }
-        
-
     }
+
+
 
     // Update is called once per frame
     void Update()

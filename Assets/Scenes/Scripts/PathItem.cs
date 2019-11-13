@@ -72,9 +72,9 @@ namespace FileSystemReader
             FileInfo[] files = directory.GetFiles();
             _size = FileSizeSum(files);
             _magnitude = GetMagnitude(_size);
-            _extension = new string(
-                Path.DirectorySeparatorChar.ToString()
-            );
+            // _extension = new string(
+            //     Path.DirectorySeparatorChar.ToString()
+            // );
         }
         private void InitFile(){
             FileInfo file = new FileInfo(_path);
