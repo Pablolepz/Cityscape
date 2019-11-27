@@ -254,12 +254,20 @@ public class main : MonoBehaviour
       // curr_city = clickedBuilding.GetComponent<build_prop>().parent_city;
       for (int a = 0; a < curr_city.building_list.GetLength(0); a++){
         for(int b = 0; b < curr_city.building_list.GetLength(1); b++){
-          // if(curr_city.building_list[a,b] != null)
-          // {}
-          if (curr_city.building_list[a,b].obj.tag != "foc_bldng")
+          Debug.Log ("a,b|" + a+","+b);
+          Debug.Log ("curr_city.building_list[a,b] is " + curr_city.building_list[a,b]);
+          Debug.Log ("curr_city.building_list[a,b].obj is " + curr_city.building_list[a,b].obj);
+          if(curr_city.building_list[a,b].obj != null)
           {
-            curr_city.building_list[a,b].obj.GetComponent<MeshRenderer>().enabled = false;
-            curr_city.building_list[a,b].obj.layer = LayerMask.NameToLayer("Ignore Raycast");
+            if (curr_city.building_list[a,b].obj.tag != "foc_bldng")
+            {
+              curr_city.building_list[a,b].obj.GetComponent<MeshRenderer>().enabled = false;
+              curr_city.building_list[a,b].obj.layer = LayerMask.NameToLayer("Ignore Raycast");
+            }
+          }
+          else
+          {
+            Debug.Log ("NULLITY!");
           }
         }
       }
@@ -283,7 +291,7 @@ public class main : MonoBehaviour
           }
           curr_city.building_list[a,b].obj.GetComponent<MeshRenderer>().enabled = true;
           curr_city.building_list[a,b].obj.layer = LayerMask.NameToLayer("Default");
-          Debug.Log ("GOTEEEEEEEEEEEEEEEEm!");
+
         }
       }
       return;
@@ -292,7 +300,7 @@ public class main : MonoBehaviour
     {
       // runZoomAnimation();
       Debug.Log("Going to "+ new_plat.GetComponent<build_prop>().parent_class.path + "=============================");
-
+      Destroy(new_plat.GetComponent<build_prop>().parent_class.city_of.par_bldng);
       city_class tmpCity = initCity(new_plat.GetComponent<build_prop>().parent_class.path, new_plat.GetComponent<build_prop>().parent_class);
 
       for (int a = 0; a < curr_city.building_list.GetLength(0); a++){
@@ -316,10 +324,13 @@ public class main : MonoBehaviour
     }
 
     // Update is called once per frame
+    float TimeT = 0;
+
     void Update()
     {
       //on click
-      if (Input.GetMouseButton(0))
+      TimeT = TimeT + Time.deltaTime;
+      if (Input.GetMouseButton(0) && TimeT > 1)
       {
         RaycastHit hitInfo = new RaycastHit();
         bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo);
@@ -349,6 +360,7 @@ public class main : MonoBehaviour
             Debug.Log("No hit");
         }
 //         Debug.Log("Mouse is down");
+        TimeT = 0;
       }
 
 //======================Camera Functions right click===================
