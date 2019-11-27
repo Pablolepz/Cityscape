@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - Cube
+  - foc_bldng
+  - Base
+  - File
+  - Directory
   layers:
   - Default
   - TransparentFX
