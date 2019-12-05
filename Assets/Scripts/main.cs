@@ -6,8 +6,8 @@ using UnityEngine.UI;
 
 public class main : MonoBehaviour
 {
-    // public Text txtCurrentDirectory;
-    private static string pathForCity = "/Users/andrew/Documents/GitHub/Cityscape";
+    private static Intro introRef = new Intro();
+    private static string pathForCity = "/Users/andrew/Documents/GitHub";//introRef.userDirInput;
     private static city_class curr_city = new city_class();
     public static float GlobalUnit = 1f;
     public static float GlobalNormalizer = 6f;
@@ -123,7 +123,7 @@ public class main : MonoBehaviour
     public static void initFirstCity()
     {
       curr_city = initCity();
-      // txtCurrentDirectory.text = "Current Directory: "+ pathForCity; 
+      Debug.Log("user input from intro screen: " + introRef.userDirInput);   
     }
 
 
