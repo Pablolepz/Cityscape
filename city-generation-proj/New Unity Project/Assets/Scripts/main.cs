@@ -136,9 +136,8 @@ public class main : MonoBehaviour
         new_city.par_bldng = new building_class();
         input = pathForCity;
         new_city.par_bldng.obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        // for (int x = 0; )
         new_city.par_bldng.obj.AddComponent<build_prop>().parent_city = null;
-        new_city.par_bldng.obj.name = pathForCity;
+        new_city.par_bldng.obj.name = "HostPlatform";
 
       }
       else
@@ -146,7 +145,7 @@ public class main : MonoBehaviour
         file_rtvr.FetchAll(input);
         new_city.par_bldng = parent;
         new_city.par_bldng.obj.name = "Parent_Building";
-        // new_city.par_bldng.obj.tag = "par_bld";
+        new_city.par_bldng.obj.tag = "par_bld";
         new_city.par_bldng.obj.AddComponent<build_prop>().parent_city = new_city;
       }
       //finding city size
@@ -417,6 +416,7 @@ public class main : MonoBehaviour
          if (hit)
          {
              Debug.Log("Hit " + hitInfo.transform.gameObject.name);
+             Debug.Log("Hit Tag " + hitInfo.transform.gameObject.tag);
              clearCity(hitInfo.transform.gameObject);
              //file was focused, so the tag needs to be replaced
              if (hitInfo.transform.gameObject.tag == "foc_bldng")
@@ -438,11 +438,6 @@ public class main : MonoBehaviour
              {
                  hitInfo.transform.gameObject.tag = "new_base";
                  zoom_to_building(hitInfo.transform.gameObject);
-                 Debug.Log ("It's working!");
-             }
-             if (hitInfo.transform.gameObject.tag == "Base")
-             {
-                 zoom_Out_to_City(hitInfo.transform.gameObject);
                  Debug.Log ("It's working!");
              }
          } else {
