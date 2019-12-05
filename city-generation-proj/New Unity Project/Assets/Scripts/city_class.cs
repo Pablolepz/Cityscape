@@ -6,7 +6,7 @@ public class city_class : MonoBehaviour
 {
     public bool is_main_city;
     public building_class par_bldng;
-    public building_class[,] building_list;
+    public List<building_class> building_list;
     // Start is called before the first frame update
     void Start()
     {

@@ -136,13 +136,17 @@ public class main : MonoBehaviour
         new_city.par_bldng = new building_class();
         input = pathForCity;
         new_city.par_bldng.obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        // for (int x = 0; )
         new_city.par_bldng.obj.AddComponent<build_prop>().parent_city = null;
+        new_city.par_bldng.obj.name = pathForCity;
 
       }
       else
       {
         file_rtvr.FetchAll(input);
         new_city.par_bldng = parent;
+        new_city.par_bldng.obj.name = "Parent_Building";
+        // new_city.par_bldng.obj.tag = "par_bld";
         new_city.par_bldng.obj.AddComponent<build_prop>().parent_city = new_city;
       }
       //finding city size
@@ -158,7 +162,7 @@ public class main : MonoBehaviour
       new_city.par_bldng.obj.AddComponent<build_prop>().child_city = new_city;
       new_city.par_bldng.obj.tag = "Base";
 
-      new_city.building_list = new building_class[x,x];
+      new_city.building_list = new List<building_class>();
       //finding max size
       float max = 0.0f;
       for(int i = 0; i < file_rtvr.FilesAndDirectories.Count; i++)
@@ -167,8 +171,8 @@ public class main : MonoBehaviour
         {
           max = (float)file_rtvr.FilesAndDirectories[i].ByteSize;
         }
-        // Debug.Log(file_rtvr.FilesAndDirectories[i].ToString());
-        // Debug.Log(max);
+        Debug.Log(file_rtvr.FilesAndDirectories[i].ToString());
+        Debug.Log(max);
       }
       GlobalNormalizer = GlobalNormalizer/max;
 
@@ -177,37 +181,39 @@ public class main : MonoBehaviour
       for (int i = 0; i < file_rtvr.FilesAndDirectories.Count; i++)
       {
         //initialize files
-        new_city.building_list[a,b] = new building_class();
-        new_city.building_list[a,b].path = pathForCity + "\\" + file_rtvr.FilesAndDirectories[i].Name;
-        new_city.building_list[a,b].item = file_rtvr.FilesAndDirectories[i];
+        new_city.building_list.Add(new building_class());
+        new_city.building_list[i].path = pathForCity + "\\" + file_rtvr.FilesAndDirectories[i].Name;
+        new_city.building_list[i].item = file_rtvr.FilesAndDirectories[i];
 
         if (file_rtvr.FilesAndDirectories[i].IsType == PathItem.Type.File)
         {
             // Debug.Log(file_rtvr.FilesAndDirectories[i]);
 
-            new_city.building_list[a,b].obj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            new_city.building_list[a,b].obj.tag="File";
-            new_city.building_list[a,b].obj.GetComponent<Renderer>().material.color = Color.grey;
-            new_city.building_list[a,b].obj.transform.localScale = new Vector3(GlobalUnit * 0.7f, Norm(GlobalSize((float)new_city.building_list[a,b].item.ByteSize))/2, GlobalUnit * 0.7f);
-            new_city.building_list[a,b].obj.transform.position = new Vector3(GlobalSize(a + 0.5f),(((new_city.building_list[a,b].obj.transform.localScale.y)) + ((GlobalSize(0.1f))/2)),GlobalSize(b + 0.5f));
+            new_city.building_list[i].obj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            new_city.building_list[i].obj.tag="File";
+            new_city.building_list[i].obj.name = file_rtvr.FilesAndDirectories[i].Name;
+            new_city.building_list[i].obj.GetComponent<Renderer>().material.color = Color.grey;
+            new_city.building_list[i].obj.transform.localScale = new Vector3(GlobalUnit * 0.7f, Norm(GlobalSize((float)new_city.building_list[i].item.ByteSize))/2, GlobalUnit * 0.7f);
+            new_city.building_list[i].obj.transform.position = new Vector3(GlobalSize(a + 0.5f),(((new_city.building_list[i].obj.transform.localScale.y)) + ((GlobalSize(0.1f))/2)),GlobalSize(b + 0.5f));
         }
         else if (file_rtvr.FilesAndDirectories[i].IsType == PathItem.Type.Directory)
         {
-          new_city.building_list[a,b].obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-          new_city.building_list[a,b].obj.tag="Directory";
-          // new_city.building_list[a,b].obj.GetComponent<Renderer>().material.color = Color.white;
+          new_city.building_list[i].obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+          new_city.building_list[i].obj.tag="Directory";
+          new_city.building_list[i].obj.name = file_rtvr.FilesAndDirectories[i].Name;
+          // new_city.building_list[i].obj.GetComponent<Renderer>().material.color = Color.white;
           // Debug.Log(file_rtvr.FilesAndDirectories[i]);
-          new_city.building_list[a,b].obj.transform.localScale = new Vector3(GlobalUnit * 0.7f, Norm(GlobalSize(max)), GlobalUnit * 0.7f);
-          new_city.building_list[a,b].obj.transform.position = new Vector3(GlobalSize(a + 0.5f),(((new_city.building_list[a,b].obj.transform.localScale.y)/2) + ((GlobalSize(0.1f))/2)),GlobalSize(b + 0.5f));
+          new_city.building_list[i].obj.transform.localScale = new Vector3(GlobalUnit * 0.7f, Norm(GlobalSize(max)), GlobalUnit * 0.7f);
+          new_city.building_list[i].obj.transform.position = new Vector3(GlobalSize(a + 0.5f),(((new_city.building_list[i].obj.transform.localScale.y)/2) + ((GlobalSize(0.1f))/2)),GlobalSize(b + 0.5f));
         }
-        new_city.building_list[a,b].obj.AddComponent<build_prop>();
-        new_city.building_list[a,b].obj.GetComponent<build_prop>().fileName = file_rtvr.FilesAndDirectories[i].Name;
-        new_city.building_list[a,b].obj.GetComponent<build_prop>().parent_city = new_city;
-        new_city.building_list[a,b].obj.GetComponent<build_prop>().parent_class = new_city.building_list[a,b];
+        new_city.building_list[i].obj.AddComponent<build_prop>();
+        new_city.building_list[i].obj.GetComponent<build_prop>().fileName = file_rtvr.FilesAndDirectories[i].Name;
+        new_city.building_list[i].obj.GetComponent<build_prop>().parent_city = new_city;
+        new_city.building_list[i].obj.GetComponent<build_prop>().parent_class = new_city.building_list[i];
 
         //city iterator
         b++;
-        if (b >= new_city.building_list.GetLength(1))
+        if (b >= x)
         {
           a++;
           b = 0;
@@ -251,23 +257,14 @@ public class main : MonoBehaviour
     }
     public static void clearCity(GameObject clickedBuilding)
     {
-      // curr_city = clickedBuilding.GetComponent<build_prop>().parent_city;
-      for (int a = 0; a < curr_city.building_list.GetLength(0); a++){
-        for(int b = 0; b < curr_city.building_list.GetLength(1); b++){
-          Debug.Log ("a,b|" + a+","+b);
-          Debug.Log ("curr_city.building_list[a,b] is " + curr_city.building_list[a,b]);
-          Debug.Log ("curr_city.building_list[a,b].obj is " + curr_city.building_list[a,b].obj);
-          if(curr_city.building_list[a,b].obj != null)
+      foreach (building_class i in curr_city.building_list)
+      {
+        Debug.Log(i.obj);
+        if (i.obj.tag != "foc_bldng")
+        {
           {
-            if (curr_city.building_list[a,b].obj.tag != "foc_bldng")
-            {
-              curr_city.building_list[a,b].obj.GetComponent<MeshRenderer>().enabled = false;
-              curr_city.building_list[a,b].obj.layer = LayerMask.NameToLayer("Ignore Raycast");
-            }
-          }
-          else
-          {
-            Debug.Log ("NULLITY!");
+            i.obj.GetComponent<MeshRenderer>().enabled = false;
+            i.obj.layer = LayerMask.NameToLayer("Ignore Raycast");
           }
         }
       }
@@ -275,51 +272,82 @@ public class main : MonoBehaviour
     }
     public static void returnCity(GameObject clickedBase)
     {
-      // curr_city = clickedBase.GetComponent<build_prop>().obj.parent_city;
-      for (int a = 0; a < curr_city.building_list.GetLength(0); a++){
-        for(int b = 0; b < curr_city.building_list.GetLength(1); b++){
-          if (curr_city.building_list[a,b].obj.tag == "foc_bldng")
+      foreach (building_class i in curr_city.building_list)
+      {
+    //   // curr_city = clickedBase.GetComponent<build_prop>().obj.parent_city;
+    //   for (int a = 0; a < curr_city.building_list.GetLength(0); a++){
+    //     for(int b = 0; b < curr_city.building_list.GetLength(1); b++){
+        if (i.obj.tag == "foc_bldng")
+        {
+          if (i.obj.GetComponent<build_prop>().child_city == null)
           {
-            if (curr_city.building_list[a,b].obj.GetComponent<build_prop>().child_city == null)
-            {
-              curr_city.building_list[a,b].obj.tag = "File";
-            }
-            else
-            {
-              curr_city.building_list[a,b].obj.tag = "Directory";
-            }
+            i.obj.tag = "File";
           }
-          curr_city.building_list[a,b].obj.GetComponent<MeshRenderer>().enabled = true;
-          curr_city.building_list[a,b].obj.layer = LayerMask.NameToLayer("Default");
-
+          else
+          {
+            i.obj.tag = "Directory";
+          }
         }
+        i.obj.GetComponent<MeshRenderer>().enabled = true;
+        i.obj.layer = LayerMask.NameToLayer("Default");
+    //
       }
-      return;
     }
     public static void zoom_to_building(GameObject new_plat)
     {
       // runZoomAnimation();
-      Debug.Log("Going to "+ new_plat.GetComponent<build_prop>().parent_class.path + "=============================");
-      Destroy(new_plat.GetComponent<build_prop>().parent_class.city_of.par_bldng);
-      city_class tmpCity = initCity(new_plat.GetComponent<build_prop>().parent_class.path, new_plat.GetComponent<build_prop>().parent_class);
+      GameObject newPlatform = new_plat;
 
-      for (int a = 0; a < curr_city.building_list.GetLength(0); a++){
-        for(int b = 0; b < curr_city.building_list.GetLength(1); b++){
-          Debug.Log("testinggggggggggggg, " + a + ", " + b);
-          if(curr_city.building_list[a,b] != null)
-          {
-            Destroy(curr_city.building_list[a,b].obj);
-          }
-          else
-          {
-            Debug.Log("Nulled");
-          }
+      Debug.Log("Going to "+ new_plat.GetComponent<build_prop>().parent_class.path + "=============================");
+
+      city_class tmpCity = initCity(newPlatform.GetComponent<build_prop>().parent_class.path, newPlatform.GetComponent<build_prop>().parent_class);
+      //Destroy previous city objects n stuff
+      foreach (building_class i in curr_city.building_list)
+      {
+        if (i.obj.tag != "Base")
+        {
+          print("Destroying " + i.obj.tag);
+          Destroy(i.obj);
+        }
+        else
+        {
+          i.obj.GetComponent<MeshRenderer>().enabled = true;
+          i.obj.layer = LayerMask.NameToLayer("Default");
         }
       }
-      // Destroy(curr_city.par_bldng.obj);
-      curr_city = null;
+      Destroy(curr_city.par_bldng.obj);
+      // Destroy(newPlatform.GetComponent<build_prop>().parent_class.city_of.par_bldng);
       curr_city = tmpCity;
-      returnCity(new_plat);
+
+      // returnCity(newPlatform);
+      return;
+    }
+
+    public static void zoom_Out_to_City(GameObject old_bld)
+    {
+      GameObject oldBuilding = old_bld;
+      // zoomOldAnimation();
+      Debug.Log("Going to "+ old_bld.GetComponent<build_prop>().parent_class.path + "=============================");
+      city_class tmpCity = initCity(oldBuilding.GetComponent<build_prop>().parent_class.path, oldBuilding.GetComponent<build_prop>().parent_class);
+      //Destroy previous city objects n stuff
+      foreach (building_class i in curr_city.building_list)
+      {
+        // if (i.obj.tag != "Base")
+        // {
+        //   print("Destroying " + i.obj.tag);
+        Destroy(i.obj);
+        // }
+        // else
+        // {
+        //   i.obj.GetComponent<MeshRenderer>().enabled = true;
+        //   i.obj.layer = LayerMask.NameToLayer("Default");
+        // }
+      }
+      Destroy(curr_city.par_bldng.obj);
+      // Destroy(newPlatform.GetComponent<build_prop>().parent_class.city_of.par_bldng);
+      curr_city = tmpCity;
+
+      // returnCity(newPlatform);
       return;
     }
 
@@ -330,13 +358,14 @@ public class main : MonoBehaviour
     {
       //on click
       TimeT = TimeT + Time.deltaTime;
-      if (Input.GetMouseButton(0) && TimeT > 1)
+      if (Input.GetMouseButton(0) && TimeT > 0.5)
       {
         RaycastHit hitInfo = new RaycastHit();
         bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo);
         if (hit)
         {
             Debug.Log("Hit " + hitInfo.transform.gameObject.name + "," + hitInfo.transform.gameObject.tag + "," + focused);
+            Debug.Log("Hit Tag " + hitInfo.transform.gameObject.tag);
             if ((hitInfo.transform.gameObject.tag == "File") || (hitInfo.transform.gameObject.tag == "Directory"))
             {
                 hitInfo.transform.gameObject.tag="foc_bldng";
@@ -364,7 +393,7 @@ public class main : MonoBehaviour
       }
 
 //======================Camera Functions right click===================
-//       if (Input.GetMouseButton(1))
+//       if (Input.GetMouseButton(1) && TimeT > 0.5)
 //        {
 //           float deltaTime = Time.time - lastTimeClicked;
 //           float h = rotateSpeed * Input.GetAxis("Mouse X");
@@ -381,34 +410,43 @@ public class main : MonoBehaviour
 //        }
 //======================Camera Functions right click end===============
 
-       if (Input.GetMouseButton(2))
+       if (Input.GetMouseButton(2) && TimeT > 0.5)
        {
          RaycastHit hitInfo = new RaycastHit();
          bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo);
          if (hit)
          {
              Debug.Log("Hit " + hitInfo.transform.gameObject.name);
+             clearCity(hitInfo.transform.gameObject);
+             //file was focused, so the tag needs to be replaced
              if (hitInfo.transform.gameObject.tag == "foc_bldng")
              {
                if (hitInfo.transform.gameObject.GetComponent<build_prop>().parent_class.item.IsType == PathItem.Type.File)
                {
                  hitInfo.transform.gameObject.tag = "File";
+                 Debug.Log ("Not a directory.");
                }
                else
                {
                  hitInfo.transform.gameObject.tag = "Directory";
+
                }
+
              }
+             // otherwise if not focused
              if (hitInfo.transform.gameObject.tag == "Directory")
              {
-                 // clearCity(hitInfo.transform.gameObject);
+                 hitInfo.transform.gameObject.tag = "new_base";
                  zoom_to_building(hitInfo.transform.gameObject);
                  Debug.Log ("It's working!");
-             } else {
-                 Debug.Log ("Not a directory.");
+             }
+             if (hitInfo.transform.gameObject.tag == "Base")
+             {
+                 zoom_Out_to_City(hitInfo.transform.gameObject);
+                 Debug.Log ("It's working!");
              }
          } else {
-             // Debug.Log("No hit");
+             Debug.Log("No hit");
          }
          // Debug.Log("Mouse is down");
        }
