@@ -1,4 +1,6 @@
+using System;
 using System.IO;
+using System.Security.Permissions;
 using System.Collections.Generic;
 
 public class FileSystemReader
@@ -13,26 +15,31 @@ public class FileSystemReader
     public List<PathItem> Files { get => _files; }
     public List<PathItem> Directories { get => _directories; }
     public List<PathItem> Volumes { get => _volumes; }
-    public List<PathItem> FilesAndDirectories {
+    public List<PathItem> FilesAndDirectories
+    {
         get => JoinFilesDirectories();
     }
 
     public FileSystemReader() { }
-
-    private List<PathItem> FetchFiles(string path)
+    public void RefreshVolumes()
     {
-        _files = PathReader.GetFiles(path);
-        return _files;
+        FetchVolumes();
     }
-    private List<PathItem> FetchDirectories(string path)
+    private void FetchFiles()
     {
-        _directories = PathReader.GetDirectories(path);
-        return _directories;
+        _files = PathReader.GetFiles();
     }
-    private List<PathItem> FetchVolumes(string path)
+    private void FetchDirectories()
     {
-        _volumes = PathReader.GetVolumes(path);
-        return _volumes;
+        _directories = PathReader.GetDirectories();
+    }
+    private void FetchVolumes()
+    {
+        try{
+            _volumes = PathReader.GetVolumes();
+        }catch(IOException){
+            _volumes.Clear();
+        }
     }
     private List<PathItem> JoinFilesDirectories()
     {
@@ -43,24 +50,32 @@ public class FileSystemReader
     }
     public void FetchAll(string path)
     {
-        FetchFiles(path);
-        FetchDirectories(path);
-        FetchVolumes(path);
+        PathReader.SetPath(path);
+        FetchFromPath();
+        if (_volumes.Count == 0) FetchVolumes();
     }
-    public void FetchFromPath(string path)
+    public void FetchFromPath()
     {
-        FetchFiles(path);
-        FetchDirectories(path);
+        try
+        {
+            FetchFiles();
+            FetchDirectories();
+        }catch (UnauthorizedAccessException)
+        {
+            _files.Clear();
+            _directories.Clear();
+        }catch (ArgumentException)
+        {
+            _files.Clear();
+            _directories.Clear();
+        }
     }
     public override string ToString()
     {
         return (
-                "[" + _files.Count +"] files, [" +
+                "[" + _files.Count + "] files, [" +
                 _directories.Count + "] directories, [" +
                 _volumes.Count + "] volumes."
             );
     }
-    // public List<PathItem> Sort(SortRule rule){
-    //     return null;
-    // }
 }

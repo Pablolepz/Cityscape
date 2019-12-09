@@ -2,6 +2,24 @@
 
 *FileSystemReader* offers an easy way to interface with the underlying **PathReader** and **PathReader** classes.
 
+## Changelog 12/8/19
++ Added exception handling for directories. When an exception is thrown, the FileSystemReader object clears the `_directories` and `_files` lists to be cleared. This might be an issue when rendering the associated objects.
++ Handled exceptions include
+  + UnauthorizedAccessException
+  + DirectoryNotFoundException
++ Removed Type-dependent PathItem constructors. Specialized constructors may now be used:
+  + `public PathItem(FileInfo file);` for files.
+  + `public PathItem(DirectoryInfo directory);` for directories.
+  + `public PathItem(DriveInfo volume);` for volumes.
++ Specialized constructors made the use of delegates unnecessary.
++ The size of a Type.Volume item is now the difference between its total size and total free space. This should make rendering be based on actual content size.
++ The size of a Type.Directory item is still the nonrecursive sum of its contents if the folder is accessble. Otherwise, the sum of the directory is 0.
+  + An alternative is `Ulong.MaxValue`. But this would be problematic since it places the size in millions of Terabytes.
+  + This dummy value may be changed using the `DEF_SIZE` value in the PathItem class.
++ In order to improve performance, volumes are now retrieved only if:
+  + The _volumes list is empty.
+  + The `RefreshVolumes();` method is called.
+
 ## ToDo
 
 + The program throws an *UnauthorizedAccessException* when trying to build a PathItem for a protected folder.
@@ -15,11 +33,7 @@ Provides a unified abstration for files, folders, and volumes to make accessing 
 
 ### Constructors
 
-The constructor takes a *string* parameter indicating which item in the file system this PathItem should represent; and a *Type* parameter to initialize the fields with the appropriate information.
-
-### Delegates
-
-The *Initializer()* delegate is set by *GetInitializer()* and is intended to call the initializer that is appropriate to the PathItem's type.
+The constructor takes a FileInfo, DirectoryInfo, or DriveInfo item and generated the corresponding PathItem object.
 
 ### Enums
 
@@ -47,7 +61,7 @@ The *Initializer()* delegate is set by *GetInitializer()* and is intended to cal
 
 ## PathReader
 
-Provides a set of methods to retrieve volumes and contents in given paths. Employs the .NET Directory class for retrieving Directory contents.
+Provides a set of methods to retrieve volumes and contents in given paths.
 
 ### Methods
 
@@ -56,7 +70,8 @@ Provides a set of methods to retrieve volumes and contents in given paths. Emplo
 
 ## FileSystemReader
 
-Provides an easy-to-use wrapper for using the PathReader and PathItem classes.
+Provides an easy-to-use wrapper for using the PathReader and PathItem classes. The class makes use of a static directoryInfo item to interact with the FileSystem.
+After construction of the FileSystemReader object, the `FetchAll();` method must be called. This method sets the directoryInfo path and populates the PathItem lists.
 
 ### Properties
 
@@ -75,10 +90,12 @@ The constructor takes no parameter as it simply initializes the object's members
 ### Methods
 
 + *FetchAll(string path)*
-  + Initializes internal List containing Volumes.
-  + Initializes internal List containing Files and Directories in the specified path.
+  + Sets directoryInfo to the specified path.
+  + Populates internal List containing Volumes.
+  + Populates internal List containing Files and Directories in the specified path.
 
-+ *FetchFromPath(string path*)
++ *RefreshVolumes()*
+  + Repopulates the _volumes.
++ *FetchFromPath(string path)*
   + Repopulates internal Lists with Files and Directories in the specified path.
-
 + *ToString()* A string containing this FileSystemReader's File, Directory, and Volume counts.
