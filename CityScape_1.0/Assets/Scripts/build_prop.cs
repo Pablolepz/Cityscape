@@ -15,6 +15,7 @@ public class build_prop : MonoBehaviour
     public city_class parent_city = null;
     public city_class child_city = null;
     public Texture label_bkgd;
+    public float size;
     // Start is called before the first frame update
     void Start()
     {
