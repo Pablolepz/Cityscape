@@ -78,7 +78,7 @@ public class main : MonoBehaviour
     {
       curr_path = curr_path.Substring(0, 3) + "..." + curr_path.Substring(slashA);
     }
-    txtCurrentDirectory.text = "Current path: " + curr_path;
+    txtCurrentDirectory.text = "Current path: " + Path.GetFullPath(curr_path);
     Debug.Log("Current path: " + curr_path);
   }
 
@@ -97,68 +97,20 @@ public class main : MonoBehaviour
     {
       input = input.Replace("\\", "\\\\");
     }
-
-    slashA = input.LastIndexOf(@"\") - 1;
-    // while(k < input.Length)
-    // {
-      // Debug.Log("Current char: " + input[i]);
-      // if (input[k] == '\\' && (k+1 < input.Length) && input[k + 1] == '\\')
-      // {
-      //   // k = input.Length;
-      //   Debug.Log("Already in windows API");
-      //   winSytax = true;
-      //   // break;
-      // }
-      // if (input[k] == '\\')
-      // {
-      //   if (slashA == 0)
-      //   {
-      //     slashA = k;
-      //   }
-      //   else
-      //   {
-      //     if (slashB == 0)
-      //     {
-      //       slashB = k;
-      //     }
-      //     else
-      //     {
-      //       slashA = slashB;
-      //       slashB = k;
-      //     }
-      //   }
-      //   Debug.Log("Detected slash");
-      //   slashCount = slashCount + 1;
-      //   if (!winSytax)
-      //   {
-      //     input = input.Insert(k,@"\");
-      //     // par_path_index = k;
-      //     k++;
-      //   }
-      // }
-      // k++;
-    // }
-    //no parents
-    // if (slashCount <= 1)
-    // {
-    //   par_path = "_";
-    // }
-    // else
-    // {
-    //   if (starter)
-    //   {
-    //     par_path = input.Substring(0,slashB);
-    //   }
-    //   else
-    //   {
-    //     // if (slashCount == 2 && input[slashA - 1] == ':')
-    //     // {
-    //     //   par_path = input.Substring(0,slashA) + "\\\\";
-    //     // }
-        par_path = input.Substring(0,slashA);
-    //   }
-    // }
-    // Debug.Log("last slash = " + )
+    if (input[input.Length - 1] == ':')
+    {
+      Debug.Log(input);
+      Debug.Log("this is a Disk!");
+      input = input + @"\";
+      Debug.Log(input);
+      par_path = input;
+    }
+    else
+    {
+      slashA = input.LastIndexOf(@"\") - 1;
+      Debug.Log(slashA);
+      par_path = input.Substring(0,slashA);
+    }
     Debug.Log("parent_path = " + par_path + " slashCount = " + slashCount);
     Debug.Log("new input = " + input);
     city_class new_city = new city_class();
@@ -527,7 +479,7 @@ public class main : MonoBehaviour
           if (hitInfo.transform.gameObject.tag == "Directory")
           {
               Debug.Log("curr_city.par_bldng.path"+ curr_city.par_bldng.path + "Going to: " + hitInfo.transform.gameObject.GetComponent<build_prop>().parent_class.path);
-              updateUI(curr_city.par_bldng.path + "\\\\" + hitInfo.transform.gameObject.name);
+              updateUI(hitInfo.transform.gameObject.GetComponent<build_prop>().parent_class.path);
               zoom_to_building(hitInfo.transform.gameObject);
               // clearCity(hitInfo.transform.gameObject);
               // hitInfo.transform.gameObject.tag = "new_base";
