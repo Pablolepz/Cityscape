@@ -431,6 +431,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   txtCurrentDirectory: {fileID: 297650149}
+  rotateSpeed: 8
+  tempColor: {r: 0, g: 0, b: 0, a: 0}
+  camRotPoint: {fileID: 0}
 --- !u!1 &536758661
 GameObject:
   m_ObjectHideFlags: 0

@@ -19,6 +19,16 @@ public class main : MonoBehaviour
   private static city_class curr_city = new city_class();
   public static float GlobalUnit = 1f;
   public static float GlobalNormalizer = 6f;
+  public static bool focused = false;
+  // camera rotation variables ==========================
+  // public static GameObject cameraOrbit;
+  public static float defViewAng = 45.0f;
+  public float rotateSpeed = 8f;
+  public Color tempColor;
+  public static GameObject mainPlatform;
+  public GameObject camRotPoint;
+  // Mouse Variables ===================
+  private float lastTimeClicked;
 
   public static float GlobalSize(float input)
   {
@@ -39,7 +49,7 @@ public class main : MonoBehaviour
     Debug.Log("path length = " + curr_path.Length);
     while(k < curr_path.Length)
     {
-      Debug.Log("Current char: " + curr_path[k] + "Current k: " + k);
+      // Debug.Log("Current char: " + curr_path[k] + "Current k: " + k);
       if (curr_path[k] == '\\')
       {
         if (slashA == 0)
@@ -72,27 +82,50 @@ public class main : MonoBehaviour
   public static city_class initCity(string input)
   {
     //to find parent and make path conform to windows path api (only accepts one slash at the moment)
+    Debug.Log("GEEZ RICK: " + input);
     int par_path_index = 0;
+    int slashA = 0;
+    int slashB = 0;
     int slashCount = 0;
     int k = 0;
+    bool winSytax = false;
     string par_path = "_";
     while(k < input.Length)
     {
       // Debug.Log("Current char: " + input[i]);
       if (input[k] == '\\' && input[k + 1] == '\\')
       {
-        k = input.Length;
+        // k = input.Length;
         Debug.Log("Already in windows API");
-        break;
+        winSytax = true;
+        // break;
       }
       if (input[k] == '\\')
       {
-        // Debug.Log("Detected slash");
+        if (slashA == 0)
+        {
+          slashA = k;
+        }
+        else
+        {
+          if (slashB == 0)
+          {
+            slashB = k;
+          }
+          else
+          {
+            slashA = slashB;
+            slashB = k;
+          }
+        }
+        Debug.Log("Detected slash");
         slashCount = slashCount + 1;
-        input = input.Insert(k,@"\");
-        par_path_index = k;
-
-        k++;
+        if (!winSytax)
+        {
+          input = input.Insert(k,@"\");
+          // par_path_index = k;
+          k++;
+        }
       }
       k++;
     }
@@ -103,7 +136,7 @@ public class main : MonoBehaviour
     }
     else
     {
-      par_path = input.Substring(0,par_path_index);
+      par_path = input.Substring(0,slashA);
     }
     Debug.Log("parent_path = " + par_path + " slashCount = " + slashCount);
     Debug.Log("new input = " + input);
@@ -115,8 +148,10 @@ public class main : MonoBehaviour
     new_city.par_bldng.obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
     new_city.par_bldng.obj.name = input;
     // new_city.par_bldng.obj.tag = "par_bld";
-    new_city.par_bldng.path = input;
-    // new_city.par_bldng.obj.AddComponent<build_prop>().parent_city = new_city;
+    Debug.Log("ADDING PATH: " + par_path);
+    new_city.par_bldng.path = par_path;
+    new_city.par_bldng.obj.AddComponent<build_prop>().parent_city = new_city;
+    new_city.par_bldng.city_of = par_path;
 
     //finding city size =================================================
     int city_list_size = file_rtvr.FilesAndDirectories.Count;
@@ -154,7 +189,7 @@ public class main : MonoBehaviour
     for (int i = 0; i < file_rtvr.FilesAndDirectories.Count; i++)
     {
       new_city.building_list.Add(new building_class());
-      new_city.building_list[i].path = input + "\\" + file_rtvr.FilesAndDirectories[i].Name;
+      new_city.building_list[i].path = input + "\\\\" + file_rtvr.FilesAndDirectories[i].Name;
       new_city.building_list[i].item = file_rtvr.FilesAndDirectories[i];
 
       //different initializations depending on file type
@@ -179,6 +214,7 @@ public class main : MonoBehaviour
       }
       new_city.building_list[i].obj.AddComponent<build_prop>();
       new_city.building_list[i].obj.GetComponent<build_prop>().fileName = file_rtvr.FilesAndDirectories[i].Name;
+      new_city.building_list[i].obj.GetComponent<build_prop>().parent_class = new_city.building_list[i];
       new_city.building_list[i].obj.GetComponent<build_prop>().parent_class = new_city.building_list[i];
       //city iterator
       b++;
@@ -237,13 +273,64 @@ public class main : MonoBehaviour
     // returnCity(newPlatform);
     return;
   }
+  public static void zoom_out_building(string input)
+  {
+    string par_city_path = input;
+    city_class tmpCity = initCity(par_city_path);
+    foreach (building_class i in curr_city.building_list)
+    {
+      if (i.obj.tag != "Base")
+      {
+        print("Destroying " + i.obj.tag);
+        Destroy(i.obj);
+      }
+      else
+      {
+        i.obj.GetComponent<MeshRenderer>().enabled = true;
+        i.obj.layer = LayerMask.NameToLayer("Default");
+      }
+    }
+    Destroy(curr_city.par_bldng.obj);
+    // Destroy(newPlatform.GetComponent<build_prop>().parent_class.city_of.par_bldng);
+    curr_city = tmpCity;
 
+    // returnCity(newPlatform);
+    return;
+  }
+  public static void returnCity(GameObject clickedBase)
+  {
+    foreach (building_class i in curr_city.building_list)
+    {
+  //   // curr_city = clickedBase.GetComponent<build_prop>().obj.parent_city;
+  //   for (int a = 0; a < curr_city.building_list.GetLength(0); a++){
+  //     for(int b = 0; b < curr_city.building_list.GetLength(1); b++){
+      if (i.obj.tag == "foc_bldng")
+      {
+        if (i.obj.GetComponent<build_prop>().child_city == null)
+        {
+          i.obj.tag = "File";
+        }
+        else
+        {
+          i.obj.tag = "Directory";
+        }
+      }
+      i.obj.GetComponent<MeshRenderer>().enabled = true;
+      i.obj.layer = LayerMask.NameToLayer("Default");
+  //
+    }
+  }
   void Start()
   {
     pathForCity = Intro.userDirInput;
     Debug.Log("We're in! " + pathForCity);
     updateUI(pathForCity);
     curr_city = initCity(pathForCity);
+    //set up camera rotate point
+    camRotPoint = new GameObject();
+    camRotPoint.transform.position = new Vector3(curr_city.par_bldng.obj.transform.position.x,curr_city.par_bldng.obj.transform.position.y,curr_city.par_bldng.obj.transform.position.z);
+    camRotPoint.transform.Rotate(0,135,0);
+    GameObject.Find("Main Camera").transform.parent = camRotPoint.transform;
   }
   void Update()
   {
@@ -259,31 +346,59 @@ public class main : MonoBehaviour
       {
           Debug.Log("Hit " + hitInfo.transform.gameObject.name + ",");// + hitInfo.transform.gameObject.tag + "," + focused);
           Debug.Log("Hit Tag " + hitInfo.transform.gameObject.tag);
-//           if ((hitInfo.transform.gameObject.tag == "File") || (hitInfo.transform.gameObject.tag == "Directory"))
-//           {
-//               hitInfo.transform.gameObject.tag="foc_bldng";
+          if ((hitInfo.transform.gameObject.tag == "File") || (hitInfo.transform.gameObject.tag == "Directory"))
+          {
+              hitInfo.transform.gameObject.tag="foc_bldng";
 //               // setCameraToObj(
 //               // hitInfo.transform.gameObject);
-//               Debug.Log ("DIRECTORY FOCUSED");
-//               focused = true;
-//               clearCity(hitInfo.transform.gameObject);
-//           } else {
-//               Debug.Log ("nopz");
-//           }
-//           if ((hitInfo.transform.gameObject.tag == "Base") && (focused == true))
-//           {
-//               returnCity(hitInfo.transform.gameObject);
-//               focused = false;
-//               Debug.Log ("CITY_RETURNED");
-//           } else {
-//               Debug.Log ("nopz");
-//           }
+              Debug.Log ("DIRECTORY FOCUSED");
+              focused = true;
+              clearCity(hitInfo.transform.gameObject);
+          } else {
+              Debug.Log ("nopz");
+          }
+          if ((hitInfo.transform.gameObject.tag == "Base") && (focused == true))
+          {
+              returnCity(hitInfo.transform.gameObject);
+              focused = false;
+              Debug.Log ("CITY_RETURNED");
+          } else {
+              Debug.Log ("nopz");
+          }
       } else {
           Debug.Log("No hit");
       }
 //         Debug.Log("Mouse is down");
       TimeT = 0;
     }
+
+
+    if (Input.GetMouseButton(1) && TimeT > 0.5)
+    {
+      float deltaTime = Time.time - lastTimeClicked;
+      float h = rotateSpeed * Input.GetAxis("Mouse X");
+      float v = rotateSpeed * Input.GetAxis("Mouse Y");
+      float maxTilt = 90 - defViewAng;
+      if (camRotPoint.transform.eulerAngles.z + v <= 0.1f || camRotPoint.transform.eulerAngles.z + v >= maxTilt)
+          v = 0;
+
+      camRotPoint.transform.eulerAngles = new Vector3(camRotPoint.transform.eulerAngles.x, camRotPoint.transform.eulerAngles.y + h, camRotPoint.transform.eulerAngles.z + v);
+     // }
+     lastTimeClicked = Time.time;
+
+   }
+
+
+
+
+
+
+
+
+
+
+
+
     //
     if (Input.GetMouseButton(2) && TimeT > 0.5)
     {
@@ -312,6 +427,7 @@ public class main : MonoBehaviour
           // // otherwise if not focused
           if (hitInfo.transform.gameObject.tag == "Directory")
           {
+              Debug.Log("Going to: " + hitInfo.transform.gameObject.GetComponent<build_prop>().parent_class.path);
               updateUI(curr_city.par_bldng.path + "\\" + hitInfo.transform.gameObject.name);
               zoom_to_building(hitInfo.transform.gameObject);
               // clearCity(hitInfo.transform.gameObject);
@@ -321,10 +437,12 @@ public class main : MonoBehaviour
           if (hitInfo.transform.gameObject.tag == "Base")
           {
             hitInfo.transform.gameObject.tag = "Directory";
+            Debug.Log("Going to BASE! @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ");
             if (hitInfo.transform.gameObject.GetComponent<build_prop>().parent_class.path != "_")
             {
-              updateUI(curr_city.par_bldng.path);
-              zoom_to_building(hitInfo.transform.gameObject);
+              Debug.Log("Going to: " + hitInfo.transform.gameObject.GetComponent<build_prop>().parent_city.par_bldng.path);
+              updateUI(hitInfo.transform.gameObject.GetComponent<build_prop>().parent_city.par_bldng.path);
+              zoom_out_building(hitInfo.transform.gameObject.GetComponent<build_prop>().parent_city.par_bldng.path);
             }
           }
       } else {
@@ -332,6 +450,12 @@ public class main : MonoBehaviour
       }
       // Debug.Log("Mouse is down");
       TimeT = 0;
+    }
+    float scrollFactor = Input.GetAxis("Mouse ScrollWheel");
+
+    if (scrollFactor != 0)
+    {
+        camRotPoint.transform.localScale = camRotPoint.transform.localScale * (1f - scrollFactor);
     }
   }
 }

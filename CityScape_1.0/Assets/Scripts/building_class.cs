@@ -7,7 +7,7 @@ public class building_class
   public string path;
   public PathItem item;
   public GameObject obj;
-  public city_class city_of;
+  public string city_of;
   // public string child_path;
 
   // public GameObject[,] city_of;
@@ -16,7 +16,7 @@ public class building_class
   // private Vector2 MousePos;
   // private Rect objRect;
 
-  public void setParent(city_class input)
+  public void setParent(string input)
   {
     city_of = input;
   }
