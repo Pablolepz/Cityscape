@@ -1,4 +1,5 @@
-﻿using System.Collections;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -85,7 +86,7 @@ public class main : MonoBehaviour
   public static city_class initCity(string input, bool starter = false)
   {
     //to find parent and make path conform to windows path api (only accepts one slash at the moment)
-    Debug.Log("GEEZ RICK: " + input);
+    Debug.Log("Line 88: " + input);
     int par_path_index = 0;
     int slashA = 0;
     int slashB = 0;
@@ -93,23 +94,22 @@ public class main : MonoBehaviour
     int k = 0;
     bool winSytax = false;
     string par_path = "_";
-    if (starter)
-    {
-      input = input.Replace("\\", "\\\\");
-    }
+
     if (input[input.Length - 1] == ':')
     {
-      Debug.Log(input);
-      Debug.Log("this is a Disk!");
       input = input + @"\";
-      Debug.Log(input);
-      par_path = input;
+      // Debug.Log("Line 101: " + input + " => this is a Disk!");
+      par_path = Path.GetFullPath(input);
     }
     else
     {
-      slashA = input.LastIndexOf(@"\") - 1;
-      Debug.Log(slashA);
-      par_path = input.Substring(0,slashA);
+      try{
+        slashA = input.LastIndexOf(@"\") - 1;
+        Debug.Log(slashA);
+        par_path = input.Substring(0,slashA);
+      }catch(ArgumentOutOfRangeException){
+        par_path = Path.GetPathRoot(input);
+      }
     }
     Debug.Log("parent_path = " + par_path + " slashCount = " + slashCount);
     Debug.Log("new input = " + input);
@@ -120,9 +120,10 @@ public class main : MonoBehaviour
     new_city.par_bldng = new building_class();
     new_city.par_bldng.obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
     // new_city.par_bldng.obj.tag = "par_bld";
-    Debug.Log("ADDING PATH: " + par_path +  "ADDING INPUT: " + input);
+    // Debug.Log("ADDING PATH: " + par_path +  "ADDING INPUT: " + input);
     if (par_path != "_")
     {
+      // Debug.Log("&&&&&&&&&&&&&&&&&&&&&&&&&");
       new_city.par_bldng.obj.name = input;
       new_city.par_bldng.path = par_path;
     }
@@ -149,7 +150,7 @@ public class main : MonoBehaviour
     // new_city.par_bldng.obj.AddComponent<build_prop>().child_city = new_city;
     new_city.par_bldng.obj.tag = "Base";
     new_city.par_bldng.obj.AddComponent<build_prop>();
-    new_city.par_bldng.obj.GetComponent<build_prop>().fileName = input;
+    new_city.par_bldng.obj.GetComponent<build_prop>().fileName = Path.GetFullPath(input);
     new_city.par_bldng.obj.GetComponent<build_prop>().parent_class = new_city.par_bldng;
 
 
@@ -331,7 +332,7 @@ public class main : MonoBehaviour
       }
     }
 
-    Debug.Log("=========================================================================");
+    // Debug.Log("=========================================================================");
     Debug.Log(curr_city.building_list.Count);
     for (int i = 0; i < curr_city.building_list.Count; i++)
     {
@@ -357,7 +358,7 @@ public class main : MonoBehaviour
       }
     }
 
-    Debug.Log("=========================================================================");
+    // Debug.Log("=========================================================================");
     Debug.Log(curr_city.building_list.Count);
     for (int i = 0; i < curr_city.building_list.Count; i++)
     {
@@ -490,7 +491,7 @@ public class main : MonoBehaviour
             hitInfo.transform.gameObject.tag = "Directory";
             if (hitInfo.transform.gameObject.GetComponent<build_prop>().parent_class.path != "_")
             {
-              Debug.Log("Going to BASE! @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ");
+              // Debug.Log("Going to BASE! @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ");
               Debug.Log("Going to: " + hitInfo.transform.gameObject.GetComponent<build_prop>().parent_city.par_bldng.path);
               updateUI(hitInfo.transform.gameObject.GetComponent<build_prop>().parent_city.par_bldng.path);
               zoom_out_building(hitInfo.transform.gameObject.GetComponent<build_prop>().parent_city.par_bldng.path);
